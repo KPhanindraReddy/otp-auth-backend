@@ -3,33 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send OTP</title>
-</head>
-<body>
-    <h2>Enter Your Email</h2>
-    <input type="email" id="email" placeholder="Enter email">
-    <button onclick="sendOTP()">Send OTP</button>
-    <p id="message"></p>
-
+    <title>Register</title>
     <script>
         function sendOTP() {
             const email = document.getElementById("email").value;
-
+            fetch("https://otp-auth-backend.onrender.com/send-otp", { 
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email }),
+            })
+            
             fetch("http://127.0.0.1:3000/send-otp", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email }),
             })
-            .then(res => res.json())
+            .then(response => response.json())
             .then(data => {
+                alert(data.message);
                 if (data.success) {
                     localStorage.setItem("email", email);
                     window.location.href = "verify.html";
-                } else {
-                    document.getElementById("message").innerText = data.message;
                 }
             });
         }
     </script>
+</head>
+<body>
+    <h2>Register</h2>
+    <input type="email" id="email" placeholder="Enter email">
+    <button onclick="sendOTP()">Send OTP</button>
 </body>
 </html>

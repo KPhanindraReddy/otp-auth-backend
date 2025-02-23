@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send OTP via Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Send OTP via Email</h2>
+        <input type="email" id="email" placeholder="Enter your email">
+        <button onclick="sendOTP()">Send OTP</button>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        function sendOTP() {
+            const email = document.getElementById("email").value;
+            const messageElement = document.getElementById("message");
+
+            if (!email) {
+                messageElement.innerText = "Please enter an email.";
+                return;
+            }
+
+            fetch("http://127.0.0.1:3000/send-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Store OTP in localStorage to compare later
+                    localStorage.setItem("otp", data.otp);
+                    localStorage.setItem("email", email);
+                    window.location.href = "verify.html"; // Redirect to OTP verification page
+                } else {
+                    messageElement.innerText = "Error sending OTP: " + data.message;
+                }
+            })
+            .catch(error => {
+                messageElement.innerText = "Error sending OTP: " + error.message;
+                console.error("Error:", error);
+            });
+        }
+    </script>
+
+</body>
+</html>

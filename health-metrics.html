@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Metrics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h2>📊 Health Metrics Tracking</h2>
+        <a href="dashboard.html" class="back-btn">Back</a>
+    </header>
+    
+    <div class="container">
+        <label>Weight (kg):</label>
+        <input type="number" id="weight" oninput="calculateBMI()" placeholder="Enter your weight...">
+
+        <label>Height (m):</label>
+        <input type="number" id="height" value="1.75" step="0.01" oninput="calculateBMI()">
+
+        <div class="bmi-box">
+            <h3>Your BMI</h3>
+            <div id="bmi-display">--</div>
+        </div>
+
+        <label>Steps Walked:</label>
+        <input type="number" id="steps" placeholder="Enter steps walked...">
+
+        <button onclick="saveMetrics()">Save Metrics</button>
+
+        <h3>📜 Previous Entries:</h3>
+        <ul id="metricsList"></ul>
+    </div>
+
+    <script>
+        function calculateBMI() {
+            let weight = document.getElementById("weight").value;
+            let height = document.getElementById("height").value;
+
+            if (weight && height) {
+                let bmi = (weight / (height * height)).toFixed(2);
+                document.getElementById("bmi-display").textContent = bmi;
+            } else {
+                document.getElementById("bmi-display").textContent = "--";
+            }
+        }
+
+        function saveMetrics() {
+            let weight = document.getElementById("weight").value;
+            let height = document.getElementById("height").value;
+            let bmi = (weight / (height * height)).toFixed(2);
+            let steps = document.getElementById("steps").value;
+
+            if (!weight || !height || !steps) {
+                alert("Please fill all fields before saving.");
+                return;
+            }
+
+            let data = JSON.parse(localStorage.getItem("metrics")) || [];
+            data.push({ weight, height, bmi, steps });
+            localStorage.setItem("metrics", JSON.stringify(data));
+
+            displayMetrics();
+        }
+
+        function displayMetrics() {
+            let data = JSON.parse(localStorage.getItem("metrics")) || [];
+            let list = document.getElementById("metricsList");
+            list.innerHTML = "";
+
+            data.forEach((entry, index) => {
+                list.innerHTML += `
+                    <li class="entry">
+                        <span>⚖️ Weight: ${entry.weight}kg</span> |
+                        <span>📏 Height: ${entry.height}m</span> |
+                        <span>📊 BMI: <strong>${entry.bmi}</strong></span> |
+                        <span>🚶‍♂️ Steps: ${entry.steps}</span>
+                    </li>
+                `;
+            });
+        }
+
+        displayMetrics();
+    </script>
+</body>
+</html>

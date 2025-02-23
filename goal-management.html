@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h2>Goal Management</h2>
+        <a href="dashboard.html" class="back-btn">Back</a>
+    </header>
+
+    <div class="container">
+        <label>Set Your Goal:</label>
+        <input type="text" id="goal" placeholder="e.g., Lose 5kg in 3 months">
+
+        <button onclick="addGoal()">Add Goal</button>
+
+        <h3>Your Goals:</h3>
+        <ul id="goalList"></ul>
+    </div>
+
+    <script>
+        function addGoal() {
+            let goal = document.getElementById("goal").value;
+            let data = JSON.parse(localStorage.getItem("goals")) || [];
+            data.push(goal);
+            localStorage.setItem("goals", JSON.stringify(data));
+            displayGoals();
+        }
+
+        function displayGoals() {
+            let data = JSON.parse(localStorage.getItem("goals")) || [];
+            let list = document.getElementById("goalList");
+            list.innerHTML = "";
+            data.forEach((goal, index) => {
+                list.innerHTML += `<li>${goal} <button onclick="removeGoal(${index})">❌</button></li>`;
+            });
+        }
+
+        function removeGoal(index) {
+            let data = JSON.parse(localStorage.getItem("goals")) || [];
+            data.splice(index, 1);
+            localStorage.setItem("goals", JSON.stringify(data));
+            displayGoals();
+        }
+
+        displayGoals();
+    </script>
+</body>
+</html>

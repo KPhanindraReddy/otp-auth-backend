@@ -4,14 +4,159 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Metrics</title>
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Modern and Professional Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #2d3748;
+        }
+
+        header {
+            background-color: #4a90e2;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+
+        .bmi-box {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .bmi-box h3 {
+            margin: 0 0 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        #bmi-display {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4a90e2;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        #metricsList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .entry span {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .delete-btn {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #e53e3e;
+        }
+    </style>
 </head>
 <body>
     <header>
         <h2>📊 Health Metrics Tracking</h2>
-        <a href="dashboard.html" class="back-btn">Back</a>
+        <a href="dashboard.html" class="back-btn">Back to Dashboard</a>
     </header>
-    
+
     <div class="container">
         <label>Weight (kg):</label>
         <input type="number" id="weight" oninput="calculateBMI()" placeholder="Enter your weight...">
@@ -35,53 +180,98 @@
 
     <script>
         function calculateBMI() {
-            let weight = document.getElementById("weight").value;
-            let height = document.getElementById("height").value;
+    let weight = parseFloat(document.getElementById("weight").value);
+    let height = parseFloat(document.getElementById("height").value);
 
-            if (weight && height) {
-                let bmi = (weight / (height * height)).toFixed(2);
-                document.getElementById("bmi-display").textContent = bmi;
-            } else {
-                document.getElementById("bmi-display").textContent = "--";
-            }
+    if (weight > 0 && height > 0) {
+        let bmi = (weight / (height * height)).toFixed(2);
+        document.getElementById("bmi-display").textContent = bmi;
+    } else {
+        document.getElementById("bmi-display").textContent = "--";
+    }
+}
+
+        // ✅ Retrieve user email from localStorage
+        const userId = localStorage.getItem("userEmail");
+    
+        if (!userId) {
+            alert("⚠️ User not logged in! Redirecting to login page...");
+            window.location.href = "login.html"; // Redirect to login if email is not found
         }
-
-        function saveMetrics() {
+    
+        async function saveMetrics() {
             let weight = document.getElementById("weight").value;
             let height = document.getElementById("height").value;
             let bmi = (weight / (height * height)).toFixed(2);
             let steps = document.getElementById("steps").value;
-
+    
             if (!weight || !height || !steps) {
                 alert("Please fill all fields before saving.");
                 return;
             }
-
-            let data = JSON.parse(localStorage.getItem("metrics")) || [];
-            data.push({ weight, height, bmi, steps });
-            localStorage.setItem("metrics", JSON.stringify(data));
-
-            displayMetrics();
+    
+            const data = { userId, weight, height, bmi, steps };
+    
+            try {
+                const response = await fetch("http://127.0.0.1:3000/save-metrics", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data),
+                });
+    
+                if (response.ok) {
+                    alert("✅ Metrics saved successfully!");
+                    displayMetrics();
+                } else {
+                    alert("❌ Failed to save metrics.");
+                }
+            } catch (error) {
+                console.error("❌ Error saving metrics:", error);
+                alert("An error occurred while saving metrics.");
+            }
         }
-
-        function displayMetrics() {
-            let data = JSON.parse(localStorage.getItem("metrics")) || [];
-            let list = document.getElementById("metricsList");
-            list.innerHTML = "";
-
-            data.forEach((entry, index) => {
-                list.innerHTML += `
-                    <li class="entry">
-                        <span>⚖️ Weight: ${entry.weight}kg</span> |
-                        <span>📏 Height: ${entry.height}m</span> |
-                        <span>📊 BMI: <strong>${entry.bmi}</strong></span> |
+    
+        async function displayMetrics() {
+            try {
+                const response = await fetch(`http://127.0.0.1:3000/get-metrics?userId=${userId}`);
+                const data = await response.json();
+    
+                const list = document.getElementById("metricsList");
+                list.innerHTML = "";
+    
+                data.forEach((entry) => {
+                    const li = document.createElement("li");
+                    li.className = "entry";
+                    li.innerHTML = `
+                        <span>⚖️ Weight: ${entry.weight}kg</span>
+                        <span>📏 Height: ${entry.height}m</span>
+                        <span>📊 BMI: <strong>${entry.bmi}</strong></span>
                         <span>🚶‍♂️ Steps: ${entry.steps}</span>
-                    </li>
-                `;
-            });
+                        <button class="delete-btn" onclick="deleteMetric('${entry._id}')">Delete</button>
+                    `;
+                    list.appendChild(li);
+                });
+            } catch (error) {
+                console.error("❌ Error fetching metrics:", error);
+            }
         }
-
+    
+        async function deleteMetric(id) {
+            try {
+                const response = await fetch(`http://127.0.0.1:3000/delete-metric/${id}`, { method: "DELETE" });
+                if (response.ok) {
+                    alert("✅ Metric deleted successfully!");
+                    displayMetrics();
+                } else {
+                    alert("❌ Failed to delete metric.");
+                }
+            } catch (error) {
+                console.error("❌ Error deleting metric:", error);
+            }
+        }
+    
         displayMetrics();
     </script>
+    
 </body>
 </html>

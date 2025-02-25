@@ -7,11 +7,7 @@
     <script>
         function sendOTP() {
             const email = document.getElementById("email").value;
-            fetch("https://otp-auth-backend.onrender.com/send-otp", { 
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
-            })
+           
             
             fetch("http://127.0.0.1:3000/send-otp", {
                 method: "POST",

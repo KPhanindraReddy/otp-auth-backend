@@ -4,31 +4,187 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send OTP</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f0f2f5;
+            transition: background 0.3s ease;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.95);
+            animation: scaleUp 0.4s ease forwards;
+        }
+
+        @keyframes scaleUp {
+            to { transform: scale(1); }
+        }
+
+        .logo {
+            width: 60px;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: slideDown 0.6s 0.2s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        h2 {
+            color: #2d3436;
+            margin: 0 0 1.5rem 0;
+            font-weight: 600;
+            opacity: 0;
+            animation: fadeIn 0.4s 0.4s ease forwards;
+        }
+
+        .email-icon {
+            width: 40px;
+            margin: 1rem auto;
+            opacity: 0;
+            animation: fadeIn 0.4s 0.6s ease forwards;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 12px rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .loading {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #message {
+            margin: 1rem 0 0 0;
+            font-size: 14px;
+            color: #e74c3c;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        #message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
 <body>
-    <h2>Enter Your Email</h2>
-    <input type="email" id="email" placeholder="Enter email">
-    <button onclick="sendOTP()">Send OTP</button>
-    <p id="message"></p>
+    <div class="container">
+        <img src="https://cdn-icons-png.flaticon.com/512/6681/6681204.png" alt="Logo" class="logo">
+        <h2>Enter Your Email Address</h2>
+        <img src="https://cdn-icons-png.flaticon.com/512/3178/3178158.png" alt="Email" class="email-icon">
+        <input type="email" id="email" placeholder="example@email.com">
+        <button onclick="sendOTP()" id="sendBtn">
+            <span>Send OTP</span>
+        </button>
+        <p id="message"></p>
+    </div>
 
     <script>
-        function sendOTP() {
+        async function sendOTP() {
             const email = document.getElementById("email").value;
+            const messageElement = document.getElementById("message");
+            const btn = document.getElementById("sendBtn");
 
-            fetch("http://127.0.0.1:3000/send-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
-            })
-            .then(res => res.json())
-            .then(data => {
+            // Button loading state
+            btn.innerHTML = '<div class="loading"></div>';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch("http://127.0.0.1:3000/send-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                });
+
+                const data = await response.json();
+                
                 if (data.success) {
+                    // Add success animation
+                    btn.innerHTML = '✓ Sent!';
+                    btn.style.background = '#2ecc71';
                     localStorage.setItem("email", email);
-                    window.location.href = "verify.html";
+                    
+                    // Smooth redirect after 1.5s
+                    setTimeout(() => {
+                        window.location.href = "verify.html";
+                    }, 1500);
                 } else {
-                    document.getElementById("message").innerText = data.message;
+                    messageElement.innerText = data.message;
+                    messageElement.classList.add("show");
+                    btn.innerHTML = 'Try Again';
+                    btn.style.background = '#007bff';
+                    btn.disabled = false;
                 }
-            });
+            } catch (error) {
+                messageElement.innerText = "Failed to connect to server";
+                messageElement.classList.add("show");
+                btn.innerHTML = 'Try Again';
+                btn.style.background = '#007bff';
+                btn.disabled = false;
+            }
         }
     </script>
 </body>

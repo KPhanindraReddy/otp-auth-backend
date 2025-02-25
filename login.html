@@ -6,55 +6,124 @@
     <title>Login</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f4f4f4;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            animation: gradientAnimation 10s ease infinite;
+        }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         .container {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
-            width: 300px;
+            width: 350px;
+            animation: fadeIn 0.5s ease-in-out;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+            animation: slideIn 0.8s ease-in-out;
+        }
+        .logo {
+            width: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
         }
         button {
             background: #007bff;
             color: white;
-            padding: 10px 15px;
+            padding: 12px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
         button:hover {
             background: #0056b3;
+            transform: scale(1.05);
+        }
+        button:active {
+            transform: scale(0.95);
         }
         #login-message {
             margin-top: 15px;
             font-size: 14px;
             color: red;
+            transition: color 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+        #login-message.show {
+            opacity: 1;
+        }
+        .illustration {
+            width: 100%;
+            max-width: 200px;
+            margin-top: 20px;
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Logo at the top -->
+        <img src="https://cdn-icons-png.flaticon.com/512/6681/6681204.png" alt="Logo" class="logo">
         <h2>Login</h2>
         <input type="email" id="login-email" placeholder="Enter email">
         <input type="password" id="login-password" placeholder="Enter password">
         <button onclick="login()">Login</button>
         <p id="login-message"></p>
+        <!-- Decorative illustration at the bottom -->
+        <img src="https://cdn-icons-png.flaticon.com/512/3209/3209260.png" alt="Illustration" class="illustration">
     </div>
 
     <script>
@@ -62,23 +131,18 @@
             const email = document.getElementById("login-email").value;
             const password = document.getElementById("login-password").value;
             const messageElement = document.getElementById("login-message");
-            fetch("https://otp-auth-backend.onrender.com/login", { 
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
-            })            
 
             fetch("http://127.0.0.1:3000/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             })
-
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     messageElement.style.color = "green";
                     messageElement.innerText = "✅ Login successful!";
+                    messageElement.classList.add("show");
                     
                     // Store user session
                     localStorage.setItem("userEmail", email);
@@ -90,11 +154,13 @@
                 } else {
                     messageElement.style.color = "red";
                     messageElement.innerText = "❌ " + data.message;
+                    messageElement.classList.add("show");
                 }
             })
             .catch(error => {
                 messageElement.style.color = "red";
                 messageElement.innerText = "❌ Server error: " + error.message;
+                messageElement.classList.add("show");
                 console.error("Error:", error);
             });
         }

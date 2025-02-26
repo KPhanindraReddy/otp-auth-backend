@@ -89,6 +89,19 @@ app.post("/login", async (req, res) => {
     }
 });
 
+// Add this to your server code
+const GoalSchema = new mongoose.Schema({
+    userId: { type: String, required: true },
+    title: { type: String, required: true },
+    description: { type: String },
+    targetDate: { type: Date },
+    category: { type: String, default: 'health' },
+    priority: { type: String, default: 'medium' },
+    progress: { type: Number, default: 0 },
+    status: { type: String, default: 'active' },
+    createdAt: { type: Date, default: Date.now }
+});
+const Goal = mongoose.model("Goal", GoalSchema);
 // ✅ Health Metrics Schema
 const MetricSchema = new mongoose.Schema({
     userId: { type: String, required: true },
@@ -99,6 +112,8 @@ const MetricSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 const Metric = mongoose.model("Metric", MetricSchema);
+
+
 
 app.post("/save-metrics", async (req, res) => {
     const { userId, weight, height, bmi, steps } = req.body;
@@ -134,7 +149,27 @@ app.get("/get-metrics", async (req, res) => {
         res.status(500).json({ success: false, message: "Error fetching metrics" });
     }
 });
+// Update Goal Progress Route
+app.put("/update-goal/:id", async (req, res) => {
+    const { id } = req.params;
+    const { progressAmount } = req.body;
 
+    try {
+        const goal = await Goal.findOneAndUpdate(
+            { _id: id },
+            { $inc: { progress: progressAmount } },
+            { new: true }
+        );
+        
+        if (!goal) {
+            return res.status(404).json({ success: false, message: "Goal not found" });
+        }
+
+        res.json({ success: true, message: "Progress updated successfully", data: goal });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error updating progress" });
+    }
+});
 
 // ✅ Delete a Metric Entry
 app.delete("/delete-metric/:id", async (req, res) => {
@@ -151,6 +186,80 @@ app.delete("/delete-metric/:id", async (req, res) => {
         res.status(500).json({ success: false, message: "Error deleting metric" });
     }
 });
+
+app.post("/add-goal", async (req, res) => {
+    const { userId, title, description, targetDate, category, priority } = req.body;
+
+    if (!userId || !title) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    try {
+        const goal = new Goal({
+            userId,
+            title,
+            description,
+            targetDate,
+            category,
+            priority
+        });
+        await goal.save();
+        res.json({ success: true, message: "Goal added successfully", data: goal });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error saving goal" });
+    }
+});
+
+app.get("/get-goals", async (req, res) => {
+    const { userId } = req.query; // userId is the user's email
+
+    try {
+        const goals = await Goal.find({ userId });
+        res.json(goals);
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error fetching goals" });
+    }
+});
+
+app.delete("/delete-goal/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deletedGoal = await Goal.findByIdAndDelete(id);
+        if (!deletedGoal) {
+            return res.status(404).json({ success: false, message: "Goal not found" });
+        }
+        res.json({ success: true, message: "Goal deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Error deleting goal" });
+    }
+});
+// Profile schema
+const profileSchema = new mongoose.Schema({
+    email: { type: String, required: true, unique: true },
+    name: String,
+    phone: String
+  });
+  
+  const Profile = mongoose.model('Profile', profileSchema);
+  
+  // Routes
+  app.get('/api/profiles', async (req, res) => {
+    const email = req.query.email;
+    const profile = await Profile.findOne({ email });
+    res.json({ name: profile?.name || '', phone: profile?.phone || '' });
+  });
+  
+  app.post('/api/profiles', async (req, res) => {
+    const { email, name, phone } = req.body;
+    await Profile.findOneAndUpdate(
+      { email },
+      { name, phone },
+      { upsert: true, new: true }
+    );
+    res.sendStatus(200);
+});
+
 
 mongoose.connection.on("connected", () => console.log("✅ MongoDB Connected"));
 mongoose.connection.on("error", (err) => console.error("❌ MongoDB Error:", err));

@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const axios = require("axios");
 require("dotenv").config();
 
 const app = express();
@@ -88,6 +89,7 @@ app.post("/login", async (req, res) => {
         res.json({ success: false, message: "❌ Invalid credentials" });
     }
 });
+
 
 // Add this to your server code
 const GoalSchema = new mongoose.Schema({
@@ -259,7 +261,36 @@ const profileSchema = new mongoose.Schema({
     );
     res.sendStatus(200);
 });
+app.post("/get-ai-recommendation", async (req, res) => {
+    const { prompt } = req.body;
+    const cohereApiKey = "fZi0aneLzH5QlKKQExUBos4jJfTJwM6iE3ELwucf"; // Replace with your actual Cohere API key
 
+    try {
+        const response = await axios.post(
+            "https://api.cohere.ai/v1/generate",
+            {
+                prompt,
+                max_tokens: 300,
+                model: "command-xlarge-nightly",
+                temperature: 0.7,
+                stop_sequences: ["--"]
+            },
+            {
+                headers: {
+                    "Authorization": `Bearer ${cohereApiKey}`,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Cohere-Version": "2022-12-06",
+                }
+            }
+        );
+
+        res.json({ reply: response.data.generations[0].text });
+    } catch (error) {
+        console.error("AI API Error:", error);
+        res.status(500).json({ error: "Error generating recommendations" });
+    }
+});
 
 mongoose.connection.on("connected", () => console.log("✅ MongoDB Connected"));
 mongoose.connection.on("error", (err) => console.error("❌ MongoDB Error:", err));

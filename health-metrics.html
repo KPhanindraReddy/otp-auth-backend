@@ -179,49 +179,51 @@
     </div>
 
     <script>
-        function calculateBMI() {
-    let weight = parseFloat(document.getElementById("weight").value);
-    let height = parseFloat(document.getElementById("height").value);
-
-    if (weight > 0 && height > 0) {
-        let bmi = (weight / (height * height)).toFixed(2);
-        document.getElementById("bmi-display").textContent = bmi;
-    } else {
-        document.getElementById("bmi-display").textContent = "--";
-    }
-}
-
-        // ✅ Retrieve user email from localStorage
+        // ✅ Ensure userId is retrieved before using it
         const userId = localStorage.getItem("userEmail");
-    
+
         if (!userId) {
             alert("⚠️ User not logged in! Redirecting to login page...");
-            window.location.href = "login.html"; // Redirect to login if email is not found
+            window.location.href = "main.html"; // Redirect to login if email is not found
         }
-    
+
+        function calculateBMI() {
+            let weight = parseFloat(document.getElementById("weight").value);
+            let height = parseFloat(document.getElementById("height").value);
+
+            if (weight > 0 && height > 0) {
+                let bmi = (weight / (height * height)).toFixed(2);
+                document.getElementById("bmi-display").textContent = bmi;
+            } else {
+                document.getElementById("bmi-display").textContent = "--";
+            }
+        }
+
         async function saveMetrics() {
             let weight = document.getElementById("weight").value;
             let height = document.getElementById("height").value;
             let bmi = (weight / (height * height)).toFixed(2);
             let steps = document.getElementById("steps").value;
-    
+
             if (!weight || !height || !steps) {
                 alert("Please fill all fields before saving.");
                 return;
             }
-    
+
             const data = { userId, weight, height, bmi, steps };
-    
+
             try {
                 const response = await fetch("http://127.0.0.1:3000/save-metrics", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data),
                 });
-    
+                const result = await response.json();
+                console.log("Save response:", result);
+
                 if (response.ok) {
                     alert("✅ Metrics saved successfully!");
-                    displayMetrics();
+                    displayMetrics(); // Refresh the list after saving
                 } else {
                     alert("❌ Failed to save metrics.");
                 }
@@ -230,15 +232,32 @@
                 alert("An error occurred while saving metrics.");
             }
         }
-    
+
         async function displayMetrics() {
+            const userId = localStorage.getItem("userEmail"); // ✅ Retrieve user email
+
+            if (!userId) {
+                alert("⚠️ User not logged in! Redirecting to login page...");
+                window.location.href = "login.html"; // Redirect to login if user not found
+                return;
+            }
+
+            console.log("🔍 Fetching metrics for user:", userId); // ✅ Debugging log
+
             try {
                 const response = await fetch(`http://127.0.0.1:3000/get-metrics?userId=${userId}`);
                 const data = await response.json();
-    
+
+                console.log("✅ Received metrics:", data); // ✅ Debugging log
+
                 const list = document.getElementById("metricsList");
                 list.innerHTML = "";
-    
+
+                if (data.length === 0) {
+                    list.innerHTML = "<p>No previous entries found.</p>";
+                    return;
+                }
+
                 data.forEach((entry) => {
                     const li = document.createElement("li");
                     li.className = "entry";
@@ -255,13 +274,13 @@
                 console.error("❌ Error fetching metrics:", error);
             }
         }
-    
+
         async function deleteMetric(id) {
             try {
                 const response = await fetch(`http://127.0.0.1:3000/delete-metric/${id}`, { method: "DELETE" });
                 if (response.ok) {
                     alert("✅ Metric deleted successfully!");
-                    displayMetrics();
+                    displayMetrics(); // Refresh the list after deletion
                 } else {
                     alert("❌ Failed to delete metric.");
                 }
@@ -269,9 +288,9 @@
                 console.error("❌ Error deleting metric:", error);
             }
         }
-    
-        displayMetrics();
+
+        // ✅ Ensure displayMetrics() runs when the page loads
+        document.addEventListener("DOMContentLoaded", displayMetrics);
     </script>
-    
 </body>
 </html>

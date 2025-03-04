@@ -253,8 +253,8 @@
 
     <script>
         async function fetchMetrics() {
-            const userId = localStorage.getItem("userEmail");
-            const response = await fetch(`http://127.0.0.1:3000/get-metrics?userId=${userId}`);
+            const userId = localStorage.getItem("email");
+            const response = await fetch(`http://127.0.0.1:4000/get-metrics?userId=${userId}`);
             return response.json();
         }
         
@@ -268,7 +268,7 @@
                 "⚠️ Would you like personalized recommendations on diet, exercise, or medical advice?" 
             `;
         
-            const response = await fetch("http://127.0.0.1:3000/get-ai-recommendation", {
+            const response = await fetch("http://127.0.0.1:4000/get-ai-recommendation", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt })

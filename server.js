@@ -8,7 +8,7 @@ const axios = require("axios");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -81,9 +81,11 @@ app.post("/set-password", async (req, res) => {
 // ✅ Login User
 app.post("/login", async (req, res) => {
     const { email, password } = req.body;
+    console.log("🔍 Received login request for email:", email);
     const user = await User.findOne({ email });
 
     if (user && await bcrypt.compare(password, user.password)) {
+        console.log("✅ Login successful for:", email);
         res.json({ success: true, userId: email,message: "✅ Login successful" });
     } else {
         res.json({ success: false, message: "❌ Invalid credentials" });
@@ -261,37 +263,45 @@ const profileSchema = new mongoose.Schema({
     );
     res.sendStatus(200);
 });
+// 🔥 Directly including API key (Not recommended for production)
+const COHERE_API_KEY = "blHaJr21ILroCAEmyH4grHvFTqBwAFtW9GKTvD8t";
+
+app.use(cors());
+app.use(bodyParser.json());
+
+// ✅ AI Chat Route
 app.post("/get-ai-recommendation", async (req, res) => {
-    const { prompt } = req.body;
-    const cohereApiKey = "fZi0aneLzH5QlKKQExUBos4jJfTJwM6iE3ELwucf"; // Replace with your actual Cohere API key
-
     try {
-        const response = await axios.post(
-            "https://api.cohere.ai/v1/generate",
-            {
-                prompt,
-                max_tokens: 300,
-                model: "command-xlarge-nightly",
-                temperature: 0.7,
-                stop_sequences: ["--"]
-            },
-            {
-                headers: {
-                    "Authorization": `Bearer ${cohereApiKey}`,
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                    "Cohere-Version": "2022-12-06",
-                }
-            }
-        );
+        const { prompt } = req.body;
+        console.log("🔍 Received AI Prompt:", prompt);
 
-        res.json({ reply: response.data.generations[0].text });
+        if (!prompt) {
+            return res.status(400).json({ error: "❌ Missing prompt in request" });
+        }
+
+        // ✅ Send request to Cohere AI Chat API
+        const aiResponse = await axios.post("https://api.cohere.ai/v1/chat", {
+            model: "command-r-plus", // ✅ Use a valid Cohere chat model
+            message: prompt,
+            temperature: 0.7,
+            max_tokens: 300
+        }, {
+            headers: { 
+                "Authorization": `Bearer ${COHERE_API_KEY}`,
+                "Content-Type": "application/json",
+                "Cohere-Version": "2022-12-06"
+            }
+        });
+
+        console.log("✅ AI Response:", aiResponse.data);
+
+        // ✅ Send AI response back to frontend
+        res.json({ reply: aiResponse.data.text });
     } catch (error) {
-        console.error("AI API Error:", error);
-        res.status(500).json({ error: "Error generating recommendations" });
+        console.error("❌ AI Service Error:", error.response?.data || error.message);
+        res.status(500).json({ error: "❌ Error generating recommendations" });
     }
 });
-
 mongoose.connection.on("connected", () => console.log("✅ MongoDB Connected"));
 mongoose.connection.on("error", (err) => console.error("❌ MongoDB Error:", err));
 

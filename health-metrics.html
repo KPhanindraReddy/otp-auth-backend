@@ -180,7 +180,7 @@
 
     <script>
         // ✅ Ensure userId is retrieved before using it
-        const userId = localStorage.getItem("userEmail");
+        const userId = localStorage.getItem("email");
 
         if (!userId) {
             alert("⚠️ User not logged in! Redirecting to login page...");
@@ -213,7 +213,7 @@
             const data = { userId, weight, height, bmi, steps };
 
             try {
-                const response = await fetch("http://127.0.0.1:3000/save-metrics", {
+                const response = await fetch("http://127.0.0.1:4000/save-metrics", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data),
@@ -234,7 +234,7 @@
         }
 
         async function displayMetrics() {
-            const userId = localStorage.getItem("userEmail"); // ✅ Retrieve user email
+            const userId = localStorage.getItem("email"); // ✅ Retrieve user email
 
             if (!userId) {
                 alert("⚠️ User not logged in! Redirecting to login page...");
@@ -245,7 +245,7 @@
             console.log("🔍 Fetching metrics for user:", userId); // ✅ Debugging log
 
             try {
-                const response = await fetch(`http://127.0.0.1:3000/get-metrics?userId=${userId}`);
+                const response = await fetch(`http://127.0.0.1:4000/get-metrics?userId=${userId}`);
                 const data = await response.json();
 
                 console.log("✅ Received metrics:", data); // ✅ Debugging log
@@ -277,7 +277,7 @@
 
         async function deleteMetric(id) {
             try {
-                const response = await fetch(`http://127.0.0.1:3000/delete-metric/${id}`, { method: "DELETE" });
+                const response = await fetch(`http://127.0.0.1:4000/delete-metric/${id}`, { method: "DELETE" });
                 if (response.ok) {
                     alert("✅ Metric deleted successfully!");
                     displayMetrics(); // Refresh the list after deletion

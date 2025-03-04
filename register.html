@@ -287,7 +287,7 @@
                 btn.disabled = true;
                 displaySpinner('sendOtpBtn', true);
     
-                fetch("http://127.0.0.1:3000/send-otp", {
+                fetch("http://127.0.0.1:4000/send-otp", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email })
@@ -318,7 +318,7 @@
                 btn.disabled = true;
                 displaySpinner('verifyOtpBtn', true);
     
-                fetch("http://127.0.0.1:3000/verify-otp", {
+                fetch("http://127.0.0.1:4000/verify-otp", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, otp })
@@ -348,7 +348,7 @@
                 btn.disabled = true;
                 displaySpinner('setPasswordBtn', true);
     
-                fetch("http://127.0.0.1:3000/set-password", {
+                fetch("http://127.0.0.1:4000/set-password", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, password })

@@ -261,6 +261,8 @@
                 </div>
             </div>
         </div>
+        <div id="successMessage" class="success-message" style="display: none;"></div>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
 
         <h3 style="margin-bottom: 1.5rem; color: var(--primary);">
             <i class="fas fa-edit"></i>Edit Profile Information
@@ -306,10 +308,10 @@
         };
 
         function loadProfile() {
-            const email = localStorage.getItem("userEmail");
+            const email = localStorage.getItem("email");
             document.getElementById("emailDisplay").textContent = email;
 
-            fetch(`http://localhost:3000/api/profiles?email=${email}`)
+            fetch(`http://localhost:4000/api/profiles?email=${email}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById("nameDisplay").textContent = data.name || "Not set";
@@ -325,15 +327,30 @@
         async function saveProfile() {
             const name = document.getElementById("name").value;
             const phone = document.getElementById("phone").value;
-
+            const successMessage = document.getElementById("successMessage");
+            const errorMessage = document.getElementById("errorMessage");
+        
+            // ✅ Ensure message elements exist before setting textContent
+            if (!successMessage || !errorMessage) {
+                console.error("❌ Error: successMessage or errorMessage element not found!");
+                return;
+            }
+        
+            // ✅ Ensure user fills all fields
+            if (!name || !phone) {
+                errorMessage.textContent = "⚠️ Please fill all fields.";
+                errorMessage.style.display = "block";
+                successMessage.style.display = "none"; // Hide success message
+                return;
+            }
             if (!name || !phone) {
                 document.getElementById("errorMessage").textContent = "Please fill all fields";
                 return;
             }
 
-            const email = localStorage.getItem("userEmail");
+            const email = localStorage.getItem("email");
 
-            await fetch("http://localhost:3000/api/profiles", {
+            await fetch("http://localhost:4000/api/profiles", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -345,7 +362,7 @@
             setTimeout(() => {
                 document.getElementById("successMessage").textContent = "";
                 loadProfile();
-            }, 3000);
+            }, 4000);
         }
     </script>
 </body>

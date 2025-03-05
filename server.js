@@ -302,6 +302,72 @@ app.post("/get-ai-recommendation", async (req, res) => {
         res.status(500).json({ error: "❌ Error generating recommendations" });
     }
 });
+
+// Workout Schema
+const WorkoutSchema = new mongoose.Schema({
+    userId: { type: String, required: true },
+    type: { type: String, enum: ['cardio', 'strength', 'flexibility'], required: true },
+    duration: { type: Number, required: true },
+    calories: { type: Number, required: true },
+    date: { type: Date, default: Date.now }
+});
+const Workout = mongoose.model('Workout', WorkoutSchema);
+
+// API Endpoints
+app.post('/api/workouts', async (req, res) => {
+    try {
+        const workout = new Workout(req.body);
+        await workout.save();
+        res.status(201).json(workout);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+app.get('/api/workouts', async (req, res) => {
+    try {
+        const workouts = await Workout.find({ userId: req.query.userId })
+            .sort({ date: -1 })
+            .limit(10);
+        res.json(workouts);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/workouts/weekly', async (req, res) => {
+    try {
+        const weeklyData = await Workout.aggregate([
+            { $match: { userId: req.query.userId } },
+            { $group: {
+                _id: { $dayOfWeek: "$date" },
+                totalDuration: { $sum: "$duration" }
+            }},
+            { $sort: { "_id": 1 } }
+        ]);
+        
+        // Map to 7-day format
+        const weeklyMinutes = Array(7).fill(0);
+        weeklyData.forEach(day => {
+            weeklyMinutes[day._id - 1] = day.totalDuration;
+        });
+        
+        res.json(weeklyMinutes);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+app.delete('/api/workouts/:id', async (req, res) => {
+    try {
+        const workout = await Workout.findByIdAndDelete(req.params.id);
+        if (!workout) {
+            return res.status(404).json({ success: false, message: 'Workout not found' });
+        }
+        res.json({ success: true, message: 'Workout deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error deleting workout', error });
+    }
+});
 mongoose.connection.on("connected", () => console.log("✅ MongoDB Connected"));
 mongoose.connection.on("error", (err) => console.error("❌ MongoDB Error:", err));
 

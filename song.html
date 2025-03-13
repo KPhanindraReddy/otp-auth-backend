@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion-Based Music Recommender</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .emotion-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #4a4a4a;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .emotion-btn:hover {
+            background: #6a6a6a;
+            transform: translateY(-2px);
+        }
+
+        .selected {
+            background: #1DB954;
+        }
+
+        .custom-emotion {
+            width: 100%;
+            padding: 12px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 2px solid #4a4a4a;
+            background: transparent;
+            color: white;
+        }
+
+        .submit-btn {
+            background: #1DB954;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .results-container {
+            margin-top: 30px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .song-card {
+            background: #333;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .song-thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+        }
+
+        .spotify-link {
+            color: #1DB954;
+            text-decoration: none;
+            margin-left: auto;
+            padding: 8px 15px;
+            border: 1px solid #1DB954;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .spotify-link:hover {
+            background: #1DB954;
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Find Songs That Match Your Mood</h1>
+        
+        <div class="emotion-grid" id="emotionGrid"></div>
+        
+        <input type="text" 
+               class="custom-emotion" 
+               placeholder="Add your own emotions or describe your feelings...">
+        
+        <button class="submit-btn" onclick="getRecommendations()">Find My Songs</button>
+        
+        <div class="loading">🎵 Finding perfect songs for you...</div>
+        
+        <div class="results-container" id="results"></div>
+    </div>
+
+    <script>
+        // Predefined emotions
+        const emotions = [
+            'Love', 'Heartbreak', 'Happy', 'Sad', 
+            'Angry', 'Nostalgic', 'Energetic', 'Calm',
+            'Lonely', 'Confident', 'Anxious', 'Hopeful'
+        ];
+
+        // Initialize emotion buttons
+        function initEmotions() {
+            const grid = document.getElementById('emotionGrid');
+            emotions.forEach(emotion => {
+                const button = document.createElement('button');
+                button.className = 'emotion-btn';
+                button.textContent = emotion;
+                button.onclick = () => toggleEmotion(button);
+                grid.appendChild(button);
+            });
+        }
+
+        // Toggle emotion selection
+        function toggleEmotion(button) {
+            button.classList.toggle('selected');
+        }
+
+        // Get selected emotions
+        function getSelectedEmotions() {
+            return Array.from(document.querySelectorAll('.selected'))
+                       .map(btn => btn.textContent);
+        }
+
+        // Get recommendations
+        async function getRecommendations() {
+            const selectedEmotions = getSelectedEmotions();
+            const customEmotion = document.querySelector('.custom-emotion').value;
+            const allEmotions = [...selectedEmotions, customEmotion].filter(e => e);
+            
+            if (allEmotions.length === 0) {
+                alert('Please select or describe at least one emotion!');
+                return;
+            }
+
+            document.querySelector('.loading').style.display = 'block';
+            
+            try {
+                const response = await fetch('/get-recommendations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ emotions: allEmotions })
+                });
+
+                const songs = await response.json();
+                displayResults(songs);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error getting recommendations');
+            } finally {
+                document.querySelector('.loading').style.display = 'none';
+            }
+        }
+
+        // Display results
+        function displayResults(songs) {
+            const container = document.getElementById('results');
+            container.innerHTML = '';
+            
+            songs.forEach(song => {
+                const card = document.createElement('div');
+                card.className = 'song-card';
+                
+                card.innerHTML = `
+                    <img src="${song.thumbnail}" class="song-thumbnail" alt="Album Art">
+                    <div>
+                        <h3>${song.name}</h3>
+                        <p>${song.artist}</p>
+                    </div>
+                    <a href="${song.spotifyLink}" class="spotify-link" target="_blank">Play on Spotify</a>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize on load
+        window.onload = initEmotions;
+    </script>
+</body>
+</html>

@@ -31,16 +31,6 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            transform: translateY(20px);
-            opacity: 0;
-            animation: containerEnter 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-        }
-
-        @keyframes containerEnter {
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
         }
 
         .chat-box {
@@ -49,11 +39,6 @@
             border-radius: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
             margin-bottom: 2rem;
-            transition: transform 0.3s ease;
-        }
-
-        .chat-box:hover {
-            transform: translateY(-2px);
         }
 
         .chat-history {
@@ -75,53 +60,17 @@
             font-size: 15px;
             display: inline-block;
             white-space: pre-wrap;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: messageEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            position: relative;
-            transition: transform 0.2s ease;
             box-shadow: 3px 3px 12px rgba(0,0,0,0.05);
+            animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes messageEnter {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .ai-message {
-            background: linear-gradient(145deg, #e3f2fd, #ffffff);
-            float: left;
-            color: var(--text-dark);
-            border-left: 4px solid var(--primary);
-            box-shadow: 3px 3px 12px rgba(74, 144, 226, 0.1);
-        }
-
-        .ai-warning {
-            background: linear-gradient(145deg, #ffebee, #ffffff);
-            border-color: var(--accent);
-            box-shadow: 3px 3px 12px rgba(211, 47, 47, 0.1);
-        }
-
-        .ai-success {
-            background: linear-gradient(145deg, #e8f5e9, #ffffff);
-            border-color: var(--secondary);
-            box-shadow: 3px 3px 12px rgba(46, 125, 50, 0.1);
-        }
-
-        .cursor {
-            display: inline-block;
-            background-color: #000;
-            width: 2px;
-            height: 1.2em;
-            vertical-align: bottom;
-            animation: blink 0.6s steps(2, start) infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
+        .section-container {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s ease-in;
         }
 
         .recommendation-btn {
@@ -132,94 +81,68 @@
             border-radius: 30px;
             cursor: pointer;
             font-size: 1.1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
-        .recommendation-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                120deg,
-                transparent,
-                rgba(255, 255, 255, 0.3),
-                transparent
-            );
-            transition: 0.5s;
-        }
-
-        .recommendation-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
-        }
-
-        .recommendation-btn:hover::before {
-            left: 100%;
-        }
-
-        .error-message {
-            color: var(--accent);
-            background: #ffebee;
-            padding: 1rem;
-            border-radius: 10px;
-            margin: 1rem 0;
-            display: none;
-            animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
-        }
-
-        @keyframes shake {
-            10%, 90% { transform: translateX(-2px); }
-            20%, 80% { transform: translateX(3px); }
-            30%, 50%, 70% { transform: translateX(-5px); }
-            40%, 60% { transform: translateX(5px); }
-        }
-
-        .back-btn {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            padding: 0.8rem 1.5rem;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .back-btn:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .health-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        .diet-options {
+            display: flex;
             gap: 1rem;
-            margin: 2rem 0;
-            opacity: 0;
-            animation: fadeInUp 0.6s 0.3s forwards;
+            margin: 1rem 0;
         }
 
-        .stat-box {
-            background: white;
-            padding: 1.5rem;
+        .recommendation-list {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .recommendation-item {
+            padding: 1.2rem;
             border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease-out;
         }
 
-        .stat-box:hover {
-            transform: translateY(-5px);
+        .diet-item { background: #e8f5e9; border-color: var(--secondary); }
+        .workout-item { background: #e3f2fd; border-color: var(--primary); }
+        .goal-item { background: #fff3e0; border-color: #ef6c00; }
+        .health-item { background: #ffebee; border-color: var(--accent); }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
 
-        @keyframes fadeInUp {
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
@@ -229,158 +152,290 @@
     <div class="container">
         <div class="chat-box">
             <div class="chat-history" id="chatHistory">
-                <!-- Initial greeting message -->
-                <div class="message ai-message" style="opacity: 1; transform: none; animation: none;">
+                <div class="message ai-message">
                     🎉 Welcome to your AI Health Companion!<br>
                     Let's create a personalized health plan together.
                 </div>
             </div>
-            
-            <button class="recommendation-btn" onclick="getRecommendations()">
-                <i class="fas fa-magic emoji"></i> Generate Smart Plan
+            <button class="recommendation-btn" onclick="getRecommendations()" data-original-text="<i class='fas fa-magic'></i> Generate Smart Plan">
+                <i class="fas fa-magic"></i> Generate Smart Plan
             </button>
-            
             <div class="error-message" id="errorMessage"></div>
-            <div class="loading-spinner" id="loadingSpinner"></div>
         </div>
-        
-        <div class="back-button" style="text-align: center; margin-top: 2rem;">
-            <button class="back-btn" onclick="goBack()">
+
+        <!-- Dietary Recommendations Section -->
+        <div class="section-container">
+            <h2><i class="fas fa-utensils"></i> Dietary Recommendations</h2>
+            <div class="diet-options">
+                <label>
+                    <input type="radio" name="diet" value="vegetarian" checked>
+                    <i class="fas fa-leaf"></i> Vegetarian
+                </label>
+                <label>
+                    <input type="radio" name="diet" value="non-vegetarian">
+                    <i class="fas fa-drumstick-bite"></i> Non-Vegetarian
+                </label>
+            </div>
+            <button class="recommendation-btn" onclick="generateFoodRecommendations()" 
+                    data-original-text="<i class='fas fa-carrot'></i> Generate Meal Plan">
+                <i class="fas fa-carrot"></i> Generate Meal Plan
+            </button>
+            <div id="foodRecommendations" class="recommendation-list"></div>
+        </div>
+
+        <!-- Workout Plan Section -->
+        <div class="section-container">
+            <h2><i class="fas fa-running"></i> Workout Plan</h2>
+            <button class="recommendation-btn" onclick="generateWorkoutRecommendations()" 
+                    data-original-text="<i class='fas fa-dumbbell'></i> Generate Workout Plan">
+                <i class="fas fa-dumbbell"></i> Generate Workout Plan
+            </button>
+            <div id="workoutRecommendations" class="recommendation-list"></div>
+        </div>
+
+        <!-- Goal Management Section -->
+        <div class="section-container">
+            <h2><i class="fas fa-bullseye"></i> Goal Management</h2>
+            <button class="recommendation-btn" onclick="generateGoals()" 
+                    data-original-text="<i class='fas fa-plus'></i> Generate Goals">
+                <i class="fas fa-plus"></i> Generate Goals
+            </button>
+            <div id="goalsList" class="recommendation-list"></div>
+        </div>
+
+        <!-- Health Status Section -->
+        <div class="section-container">
+            <h2><i class="fas fa-heartbeat"></i> Health Status</h2>
+            <button class="recommendation-btn" onclick="generateHealthStatus()" 
+                    data-original-text="<i class='fas fa-share'></i> Generate & Share Status">
+                <i class="fas fa-share"></i> Generate & Share Status
+            </button>
+            <div id="healthStatus" class="health-item recommendation-item" style="display: none;"></div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="recommendation-btn back-btn" onclick="goBack()">
                 <i class="fas fa-arrow-left"></i> Return to Dashboard
             </button>
         </div>
     </div>
 
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
     <script>
-        async function fetchMetrics() {
-            const userId = localStorage.getItem("email");
-            const response = await fetch(`http://127.0.0.1:4000/get-metrics?userId=${userId}`);
-            return response.json();
+        // Common Functions
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
         }
-        
-        async function generateRecommendations(bmi, weight, height, steps) {
-            const prompt = `
-                Generate personalized health plan for BMI ${bmi}, 
-                weight ${weight}kg, height ${height}m, 
-                ${steps} steps daily. Include diet and workout.
-                Start by classifying BMI, then explain associated risks,
-                and suggest practical improvements. End with:
-                "⚠️ Would you like personalized recommendations on diet, exercise, or medical advice?" 
-            `;
-        
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showError(error) {
+            console.error(error);
+            const errorElement = document.getElementById("errorMessage");
+            errorElement.textContent = error.message;
+            errorElement.style.display = 'block';
+            setTimeout(() => errorElement.style.display = 'none', 5000);
+        }
+
+        async function fetchMetrics() {
+            try {
+                const userId = localStorage.getItem("email");
+                const response = await fetch(`http://127.0.0.1:4000/get-metrics?userId=${userId}`);
+                return await response.json();
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        // Main Recommendations
+        async function getRecommendations() {
+            const btn = event.target;
+            try {
+                showLoading();
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generating...`;
+                
+                const metrics = await fetchMetrics();
+                const { bmi } = metrics[0];
+                const prompt = `Create a comprehensive health plan for BMI ${bmi}. 
+                    Include diet suggestions, workout routines, and health recommendations. 
+                    Format with clear sections and emojis.`;
+                
+                const response = await getAIResponse(prompt);
+                displayChatResponse(response.reply);
+            } catch (error) {
+                showError(error);
+            } finally {
+                hideLoading();
+                btn.innerHTML = btn.getAttribute('data-original-text');
+            }
+        }
+
+        // Food Recommendations
+        async function generateFoodRecommendations() {
+            const btn = event.target;
+            try {
+                showLoading();
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Cooking...`;
+                
+                const dietType = document.querySelector('input[name="diet"]:checked').value;
+                const metrics = await fetchMetrics();
+                const { bmi } = metrics[0];
+                
+                const prompt = `List 7 ${dietType} foods for BMI ${bmi} as numbered items. 
+                    Format: "1. [Emoji] Food Name - Brief benefit description"`;
+                
+                const response = await getAIResponse(prompt);
+                displayRecommendations(response.reply, 'foodRecommendations', 'diet-item');
+            } catch (error) {
+                showError(error);
+            } finally {
+                hideLoading();
+                btn.innerHTML = btn.getAttribute('data-original-text');
+            }
+        }
+
+        // Workout Recommendations
+        async function generateWorkoutRecommendations() {
+            const btn = event.target;
+            try {
+                showLoading();
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Planning...`;
+                
+                const metrics = await fetchMetrics();
+                const { bmi } = metrics[0];
+                const prompt = `Suggest 5 workouts for BMI ${bmi} with durations. 
+                    Format: "1. [Emoji] Exercise (Duration) - Benefit"`;
+                
+                const response = await getAIResponse(prompt);
+                displayRecommendations(response.reply, 'workoutRecommendations', 'workout-item');
+            } catch (error) {
+                showError(error);
+            } finally {
+                hideLoading();
+                btn.innerHTML = btn.getAttribute('data-original-text');
+            }
+        }
+
+        // Goal Management
+        async function generateGoals() {
+            const btn = event.target;
+            try {
+                showLoading();
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Creating...`;
+                
+                const metrics = await fetchMetrics();
+                const { bmi } = metrics[0];
+                const prompt = `Create 3 SMART goals for BMI ${bmi}. 
+                    Format: "1. [Emoji] Goal Description"`;
+                
+                const response = await getAIResponse(prompt);
+                displayGoals(response.reply);
+            } catch (error) {
+                showError(error);
+            } finally {
+                hideLoading();
+                btn.innerHTML = btn.getAttribute('data-original-text');
+            }
+        }
+
+        // Health Status
+        async function generateHealthStatus() {
+            const btn = event.target;
+            try {
+                showLoading();
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Analyzing...`;
+                
+                const metrics = await fetchMetrics();
+                const { bmi } = metrics[0];
+                const prompt = `Create a friendly health summary for BMI ${bmi} with emojis. 
+                    Max 2 sentences for easy sharing.`;
+                
+                const response = await getAIResponse(prompt);
+                const statusCard = document.getElementById("healthStatus");
+                statusCard.innerHTML = response.reply;
+                statusCard.style.display = 'block';
+            } catch (error) {
+                showError(error);
+            } finally {
+                hideLoading();
+                btn.innerHTML = btn.getAttribute('data-original-text');
+            }
+        }
+
+        // Display Functions
+        function displayRecommendations(text, containerId, styleClass) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            text.split('\n').forEach(line => {
+                const div = document.createElement('div');
+                div.className = `recommendation-item ${styleClass}`;
+                div.innerHTML = line.replace(/-/g, '<br><span style="color: #666;">- ');
+                container.appendChild(div);
+            });
+        }
+
+        function displayGoals(text) {
+            const container = document.getElementById("goalsList");
+            container.innerHTML = '';
+            
+            text.split('\n').forEach(line => {
+                const div = document.createElement('div');
+                div.className = 'recommendation-item goal-item';
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <button class="add-goal-btn" onclick="addGoal('${line.replace(/^\d+\.\s*/, '')}')">
+                            +
+                        </button>
+                        ${line}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Backend Communication
+        async function getAIResponse(prompt) {
             const response = await fetch("http://127.0.0.1:4000/get-ai-recommendation", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ prompt })
             });
-        
-            if (!response.ok) {
-                throw new Error(`AI service error: ${await response.text()}`);
-            }
-        
+            if (!response.ok) throw new Error('AI service error');
             return response.json();
         }
-        
-        function addMessage(content, colorClass, emoji) {
-            const history = document.getElementById("chatHistory");
-            const msgElement = document.createElement("div");
-            msgElement.classList.add("message", "ai-message", colorClass);
-            msgElement.innerHTML = `<span class="emoji">${emoji}</span> <span class="text"></span>`;
-            history.appendChild(msgElement);
-            history.scrollTop = history.scrollHeight;
-            
-            const textElement = msgElement.querySelector('.text');
-            let index = 0;
-            const text = content.split('');
-            
-            function type() {
-                if (index < text.length) {
-                    textElement.textContent += text[index];
-                    index++;
-                    setTimeout(type, 30);
-                }
-            }
-            
-            type();
-        }
-        
-        function parseRecommendations(text) {
-            const keywords = {
-                "urgent": "ai-warning",
-                "high risk": "ai-warning",
-                "unhealthy": "ai-warning",
-                "healthy": "ai-success",
-                "recommended": "ai-success",
-                "low risk": "ai-success",
-                "Would you like": "ai-warning"
-            };
-        
-            return text.split("\n").map(line => {
-                let colorClass = "ai-success";
-                let emoji = "✅";
-                
-                for (const [key, cls] of Object.entries(keywords)) {
-                    if (line.toLowerCase().includes(key)) {
-                        colorClass = cls;
-                        emoji = colorClass === "ai-warning" ? "⚠️" : "✅";
-                        break;
-                    }
-                }
-        
-                return { line, colorClass, emoji };
-            });
-        }
-        
-        async function getRecommendations() {
-            const chatHistory = document.getElementById("chatHistory");
-            const loadingSpinner = document.getElementById("loadingSpinner");
-            chatHistory.innerHTML = '';
-            document.getElementById("errorMessage").style.display = 'none';
-        
-            const initialMessage = document.createElement("div");
-            initialMessage.className = "message ai-message";
-            initialMessage.innerHTML = `🔍 Analyzing your health profile...`;
-            chatHistory.appendChild(initialMessage);
-        
-            loadingSpinner.style.display = 'block';
-            
+
+        async function addGoal(goalText) {
             try {
-                const metrics = await fetchMetrics();
-                if (!metrics || metrics.length === 0) {
-                    throw new Error("No health metrics found.");
-                }
-        
-                const lastMetric = metrics[0];
-                const { bmi, weight, height, steps } = lastMetric;
-        
-                const aiResponse = await generateRecommendations(bmi, weight, height, steps);
-                loadingSpinner.style.display = 'none';
-        
-                const recommendations = parseRecommendations(aiResponse.reply);
-                recommendations.forEach(({ line, colorClass, emoji }) => {
-                    addMessage(line, colorClass, emoji);
+                const userId = localStorage.getItem("email");
+                const response = await fetch('http://127.0.0.1:4000/add-goal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId,
+                        title: goalText.split('-')[0].trim(),
+                        description: goalText,
+                        category: "Health Improvement",
+                        priority: "Medium",
+                        targetDate: new Date(Date.now() + 12096e5).toISOString()
+                    })
                 });
+
+                if (!response.ok) throw new Error('Failed to add goal');
+                alert(`Goal added successfully!`);
             } catch (error) {
-                console.error("Error processing message:", error);
-                const errorElement = document.getElementById("errorMessage");
-                errorElement.textContent = error.message;
-                errorElement.style.display = 'block';
-                setTimeout(() => {
-                    errorElement.style.display = 'none';
-                }, 5000);
-                loadingSpinner.style.display = 'none';
+                showError(error);
             }
         }
-        
+
         function goBack() {
             window.location.href = "dashboard.html";
         }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                document.querySelector('.container').style.opacity = 1;
-            }, 100);
-        });
     </script>
 </body>
 </html>
